@@ -24,7 +24,7 @@ export class App implements IApp {
   }
 
   private configureRoutes() {
-    this.app.use("/", this.movieRoutes.getRouter());
+    this.app.use("/api/movies", this.movieRoutes.getRouter());
   }
 
   public listen(): void {
