@@ -1,26 +1,15 @@
-import { App } from "./app";
-import { config } from "./config/env.config";
+import { container } from "./di/container";
+import { inject, injectable } from "tsyringe";
+import { IApp } from "./interfaces/Iapp";
 
+@injectable()
 export class Server {
-  private appInstance: App;
+  constructor(@inject("IApp") private _appInstance: IApp) {}
 
-  constructor() {
-    this.appInstance = new App();
-  }
-
-  public start() {
-    try {
-      const app = this.appInstance.app;
-      app.listen(config.PORT, () => {
-        console.log(
-          `Movie-Finder server is running on http://localhost:${config.PORT}`
-        );
-      });
-    } catch (error) {
-      console.log("error occured while connecting server", error);
-    }
+  public start(): void {
+    this._appInstance.listen();
   }
 }
 
-const server = new Server();
+const server = container.resolve(Server);
 server.start();
