@@ -1,5 +1,5 @@
 export interface IMovie {
   title: string;
-  year: string;
+  yearOfRelease: string;
   poster: string;
 }
