@@ -5,11 +5,11 @@ import { fetchMovies } from "../services/movieServices";
 import type { IMovie } from "../model/movie";
 import { useDebounce } from "../hooks/debounce";
 import { SkeletonList } from "../component/SkeletonList";
+import toast from "react-hot-toast";
 
 export const Home: React.FC = () => {
   const [movies, setMovies] = useState<IMovie[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
 
   const debouncedQuery = useDebounce(searchQuery, 600);
@@ -23,14 +23,31 @@ export const Home: React.FC = () => {
       if (!debouncedQuery.trim()) return;
 
       setLoading(true);
-      setError(null);
 
       try {
         const response = await fetchMovies(debouncedQuery);
-        setMovies(response.data || []);
+
+        if (response.success) {
+          setMovies(response.data || []);
+          if (response.data && response.data.length > 0) {
+            toast.success(`Found ${response.data.length} movies`);
+          }
+        } else {
+          const message = response.message || "Movie not found!";
+
+          if (message === "Movie not found!") {
+            toast.error("No movie found with that name");
+          } else if (message === "Too many results.") {
+            toast.error("Too many results. Please be more specific");
+          } else {
+            toast.error(message);
+          }
+
+          setMovies([]);
+        }
       } catch (err) {
-        console.log(err);
-        setError("Failed to fetch movies. Please try again.");
+        console.error(err);
+        toast.error("Failed to fetch movies. Please try again.");
         setMovies([]);
       } finally {
         setLoading(false);
@@ -45,10 +62,10 @@ export const Home: React.FC = () => {
       <h1 className="text-center text-4xl font-bold mb-6">Movie Finder</h1>
 
       <SearchBar onSearch={handleSearch} />
-      {loading && <SkeletonList count={movies.length} />}
-      {error && <p className="text-center text-xl text-red-500">{error}</p>}
 
-      {!loading && !error && movies.length === 0 && (
+      {loading && <SkeletonList count={movies.length || 6} />}
+
+      {!loading && movies.length === 0 && (
         <p className="text-center text-xl text-gray-400">
           Search for a movie to get started
         </p>
