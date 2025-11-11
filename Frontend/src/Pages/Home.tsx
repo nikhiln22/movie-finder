@@ -1,7 +1,12 @@
 import { useEffect, useState } from "react";
 import { SearchBar } from "../component/SearchBar";
 import { MovieList } from "../component/MovieList";
-import { fetchMovies } from "../services/movieServices";
+import {
+  fetchMovies,
+  addToFavourites,
+  removeFromFavourites,
+  fetchFavourites,
+} from "../services/movieServices";
 import type { IMovie } from "../model/movie";
 import { useDebounce } from "../hooks/debounce";
 import { SkeletonList } from "../component/SkeletonList";
@@ -9,6 +14,7 @@ import toast from "react-hot-toast";
 
 export const Home: React.FC = () => {
   const [movies, setMovies] = useState<IMovie[]>([]);
+  const [favorites, setFavorites] = useState<IMovie[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -19,8 +25,46 @@ export const Home: React.FC = () => {
   };
 
   useEffect(() => {
+    const loadFavorites = async () => {
+      const response = await fetchFavourites();
+      if (response.success) {
+        setFavorites(response.data);
+      }
+    };
+    loadFavorites();
+  }, []);
+
+  const handleToggleFavorite = async (movie: IMovie) => {
+    const isAlreadyFav = favorites.some((f) => f.imdbID === movie.imdbID);
+    console.log("isAlreadyFav in the home page:", isAlreadyFav);
+
+    if (isAlreadyFav) {
+      const result = await removeFromFavourites(movie.imdbID);
+
+      if (result.success) {
+        setFavorites((prev) => prev.filter((f) => f.imdbID !== movie.imdbID));
+        toast.success("Removed from favourites");
+      } else {
+        toast.error("Failed to remove from favourites");
+      }
+    } else {
+      const result = await addToFavourites(movie);
+
+      if (result.success) {
+        setFavorites((prev) => [...prev, movie]);
+        toast.success("Added to favourites");
+      } else {
+        toast.error("Failed to add to favourites");
+      }
+    }
+  };
+
+  useEffect(() => {
     const fetchData = async () => {
-      if (!debouncedQuery.trim()) return;
+      if (!debouncedQuery.trim()) {
+        setMovies([]);
+        return;
+      }
 
       setLoading(true);
 
@@ -29,25 +73,12 @@ export const Home: React.FC = () => {
 
         if (response.success) {
           setMovies(response.data || []);
-          if (response.data && response.data.length > 0) {
-            toast.success(`Found ${response.data.length} movies`);
-          }
         } else {
-          const message = response.message || "Movie not found!";
-
-          if (message === "Movie not found!") {
-            toast.error("No movie found with that name");
-          } else if (message === "Too many results.") {
-            toast.error("Too many results. Please be more specific");
-          } else {
-            toast.error(message);
-          }
-
           setMovies([]);
+          toast.error(response.message || "Movie not found!");
         }
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to fetch movies. Please try again.");
+      } catch {
+        toast.error("Failed to fetch movies!");
         setMovies([]);
       } finally {
         setLoading(false);
@@ -63,15 +94,21 @@ export const Home: React.FC = () => {
 
       <SearchBar onSearch={handleSearch} />
 
-      {loading && <SkeletonList count={movies.length || 6} />}
+      {loading && <SkeletonList count={6} />}
+
+      {!loading && movies.length > 0 && (
+        <MovieList
+          movies={movies}
+          favorites={favorites}
+          onToggleFavorite={handleToggleFavorite}
+        />
+      )}
 
       {!loading && movies.length === 0 && (
         <p className="text-center text-xl text-gray-400">
           Search for a movie to get started
         </p>
       )}
-
-      {!loading && movies.length > 0 && <MovieList movies={movies} />}
     </div>
   );
 };

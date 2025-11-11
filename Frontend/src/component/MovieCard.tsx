@@ -6,6 +6,8 @@ export const MovieCard: React.FC<IMovieCardProps> = ({
   title,
   yearOfRelease,
   poster,
+  isFavorite,
+  onToggleFavorite,
 }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -33,19 +35,20 @@ export const MovieCard: React.FC<IMovieCardProps> = ({
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center bg-gray-700">
-            <div className="text-center px-4">
-              <Film className="w-16 h-16 text-gray-500 mx-auto mb-2" />
-              <p className="text-gray-400 text-xs">No Poster</p>
-            </div>
+            <Film className="w-16 h-16 text-gray-500 mx-auto mb-2" />
+            <p className="text-gray-400 text-xs">No Poster</p>
           </div>
         )}
 
         <button
+          onClick={onToggleFavorite}
           className="absolute top-2 right-2 p-1.5 rounded-full bg-black/50 cursor-pointer"
-          aria-label="Add to favorites"
-          title="Add to favorites"
         >
-          <Heart className="w-4 h-4 text-white" />
+          <Heart
+            className={`w-4 h-4 ${
+              isFavorite ? "text-red-500 fill-red-500" : "text-white"
+            }`}
+          />
         </button>
       </div>
 
@@ -56,7 +59,6 @@ export const MovieCard: React.FC<IMovieCardProps> = ({
         >
           {title}
         </h2>
-
         <p className="text-xs text-yellow-400">{formatYear(yearOfRelease)}</p>
       </div>
     </div>

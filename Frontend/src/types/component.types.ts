@@ -2,6 +2,8 @@ import type { IMovie } from "../model/movie";
 
 export interface IMovieListProps {
   movies: IMovie[];
+  favorites: IMovie[];
+  onToggleFavorite: (movie: IMovie) => void;
 }
 
 export interface ISearchBarProps {
@@ -12,6 +14,8 @@ export interface IMovieCardProps {
   title: string;
   yearOfRelease: string;
   poster: string;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 }
 
 export interface SkeletonListProps {
