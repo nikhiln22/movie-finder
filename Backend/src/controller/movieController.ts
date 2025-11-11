@@ -35,4 +35,76 @@ export class MovieController {
       });
     }
   }
+
+  async addToFavorites(req: Request, res: Response): Promise<void> {
+    try {
+      console.log("Add to favorites request:", req.body);
+
+      const { sessionId, movie } = req.body;
+
+      if (!sessionId || !movie) {
+        res.status(HttpStatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: "sessionId and movie are required",
+        });
+        return;
+      }
+
+      if (!movie.imdbID || !movie.title || !movie.yearOfRelease) {
+        res.status(HttpStatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: "Invalid movie data",
+        });
+        return;
+      }
+
+      const result = await this._movieService.addToFavorites(sessionId, movie);
+
+      const statusCode = result.success
+        ? HttpStatusCodes.OK
+        : HttpStatusCodes.BAD_REQUEST;
+
+      res.status(statusCode).json(result);
+    } catch (error) {
+      console.error("Error in addToFavorites controller:", error);
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Something went wrong while adding to favorites",
+      });
+    }
+  }
+
+  async removeFromFavorites(req: Request, res: Response): Promise<void> {
+    try {
+      console.log("Remove from favorites request:", req.params, req.body);
+
+      const { sessionId } = req.body;
+      const { imdbID } = req.params;
+
+      if (!sessionId || !imdbID) {
+        res.status(HttpStatusCodes.BAD_REQUEST).json({
+          success: false,
+          message: "sessionId and imdbID are required",
+        });
+        return;
+      }
+
+      const result = await this._movieService.removeFromFavorites(
+        sessionId,
+        imdbID
+      );
+
+      const statusCode = result.success
+        ? HttpStatusCodes.OK
+        : HttpStatusCodes.BAD_REQUEST;
+
+      res.status(statusCode).json(result);
+    } catch (error) {
+      console.error("Error in removeFromFavorites controller:", error);
+      res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({
+        success: false,
+        message: "Something went wrong while removing from favorites",
+      });
+    }
+  }
 }

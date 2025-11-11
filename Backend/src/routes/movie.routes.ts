@@ -18,6 +18,16 @@ export class MovieRoutes {
       "/search",
       this._movieController.getMovie.bind(this._movieController)
     );
+
+    this.router
+      .post(
+        "/favourites",
+        this._movieController.addToFavorites.bind(this._movieController)
+      )
+      .delete(
+        "/favourites/:imdbId",
+        this._movieController.removeFromFavorites.bind(this._movieController)
+      );
   }
 
   public getRouter(): Router {

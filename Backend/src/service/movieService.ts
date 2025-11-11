@@ -3,10 +3,15 @@ import { IMovieService } from "../interfaces/ImovieService";
 import { injectable, inject } from "tsyringe";
 import axios from "axios";
 import { config } from "../config/env.config";
+import { IFavoriteMovieDto } from "../interfaces/Dto/favouritesDto";
+import { IMovieRepository } from "../interfaces/ImovieRepository";
 
 @injectable()
 export class MovieService implements IMovieService {
-  constructor() {}
+  constructor(
+    @inject("IMovieRepository") private _movieRepository: IMovieRepository
+  ) {}
+
   async getMovie(
     search: string
   ): Promise<{ success: boolean; message: string; data?: IMovieServiceDto[] }> {
@@ -41,6 +46,69 @@ export class MovieService implements IMovieService {
       return {
         success: false,
         message: "An unexpected error occurred",
+      };
+    }
+  }
+
+  async addToFavorites(
+    sessionId: string,
+    movie: IFavoriteMovieDto
+  ): Promise<{ success: boolean; message: string; imdbID?: string }> {
+    try {
+      console.log("Adding to favorites:", { sessionId, movie });
+
+      const result = this._movieRepository.addToFavorites(sessionId, movie);
+
+      if (result === null) {
+        return {
+          success: false,
+          message: "Movie is already in favorites",
+        };
+      }
+
+      return {
+        success: true,
+        message: "Movie added to favorites successfully",
+        imdbID: result.imdbID,
+      };
+    } catch (error) {
+      console.error("Error adding to favorites:", error);
+      return {
+        success: false,
+        message: "Failed to add movie to favorites",
+      };
+    }
+  }
+
+  async removeFromFavorites(
+    sessionId: string,
+    imdbID: string
+  ): Promise<{ success: boolean; message: string; imdbID?: string }> {
+    try {
+      console.log("Removing from favorites:", { sessionId, imdbID });
+
+      const result = this._movieRepository.removeFromFavorites(
+        sessionId,
+        imdbID
+      );
+
+      if (result === null) {
+        return {
+          success: false,
+          message: "Movie not found in favorites",
+        };
+      }
+
+      return {
+        success: true,
+        message: "Movie removed from favorites successfully",
+        imdbID: result,
+      };
+    } catch (error) {
+      console.error("Error removing from favorites:", error);
+      return {
+        success: false,
+        message: "Failed to remove movie from favorites",
       };
     }
   }
