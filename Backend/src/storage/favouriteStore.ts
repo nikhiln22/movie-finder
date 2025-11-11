@@ -1,6 +1,6 @@
 import { injectable } from "tsyringe";
 import { IFavoriteMovieDto } from "../interfaces/Dto/favouritesDto";
-import { IFavoritesStore } from "../interfaces/ifavouriteStore";
+import { IFavoritesStore } from "../interfaces/IfavouriteStore";
 
 @injectable()
 export class FavoritesStore implements IFavoritesStore {
@@ -48,5 +48,9 @@ export class FavoritesStore implements IFavoritesStore {
     );
 
     return imdbID;
+  }
+
+  getFavorites(sessionId: string): IFavoriteMovieDto[] {
+    return this.store.get(sessionId) || [];
   }
 }

@@ -20,6 +20,10 @@ export class MovieRoutes {
     );
 
     this.router
+      .get(
+        "/favourites",
+        this._movieController.getFavorites.bind(this._movieController)
+      )
       .post(
         "/favourites",
         this._movieController.addToFavorites.bind(this._movieController)

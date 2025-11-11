@@ -6,4 +6,5 @@ export interface IMovieRepository {
     movie: IFavoriteMovieDto
   ): IFavoriteMovieDto | null;
   removeFromFavorites(sessionId: string, imdbID: string): string | null;
+  getFavorites(sessionId: string): IFavoriteMovieDto[];
 }

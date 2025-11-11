@@ -16,4 +16,7 @@ export interface IMovieService {
     sessionId: string,
     imdbID: string
   ): Promise<{ success: boolean; message: string }>;
+  getFavorites(
+    sessionId: string
+  ): Promise<{ success: boolean; data: IFavoriteMovieDto[] }>;
 }

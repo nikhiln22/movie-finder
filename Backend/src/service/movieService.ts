@@ -92,6 +92,11 @@ export class MovieService implements IMovieService {
         imdbID
       );
 
+      console.log(
+        "result in the remove from favourites in the movie service:",
+        result
+      );
+
       if (result === null) {
         return {
           success: false,
@@ -109,6 +114,27 @@ export class MovieService implements IMovieService {
       return {
         success: false,
         message: "Failed to remove movie from favorites",
+      };
+    }
+  }
+
+  async getFavorites(
+    sessionId: string
+  ): Promise<{ success: boolean; data: IFavoriteMovieDto[] }> {
+    try {
+      console.log("Fetching favorites for:", sessionId);
+
+      const favorites = this._movieRepository.getFavorites(sessionId);
+
+      return {
+        success: true,
+        data: favorites,
+      };
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+      return {
+        success: false,
+        data: [],
       };
     }
   }

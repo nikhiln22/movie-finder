@@ -6,4 +6,5 @@ export interface IFavoritesStore {
     movie: IFavoriteMovieDto
   ): IFavoriteMovieDto | null;
   removeFavorite(sessionId: string, imdbID: string): string | null;
+  getFavorites(sessionId: string): IFavoriteMovieDto[];
 }

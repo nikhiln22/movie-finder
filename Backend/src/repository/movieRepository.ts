@@ -1,7 +1,7 @@
 import { injectable, inject } from "tsyringe";
 import { IFavoriteMovieDto } from "../interfaces/Dto/favouritesDto";
 import { IMovieRepository } from "../interfaces/ImovieRepository";
-import { IFavoritesStore } from "../interfaces/ifavouriteStore";
+import { IFavoritesStore } from "../interfaces/IfavouriteStore";
 
 @injectable()
 export class MovieRepository implements IMovieRepository {
@@ -18,5 +18,9 @@ export class MovieRepository implements IMovieRepository {
 
   removeFromFavorites(sessionId: string, imdbID: string): string | null {
     return this._favouriteStore.removeFavorite(sessionId, imdbID);
+  }
+
+  getFavorites(sessionId: string): IFavoriteMovieDto[] {
+    return this._favouriteStore.getFavorites(sessionId);
   }
 }

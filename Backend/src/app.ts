@@ -21,6 +21,7 @@ export class App implements IApp {
       methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     };
     this.app.use(cors(corsOptions));
+    this.app.use(express.json());
   }
 
   private configureRoutes() {
