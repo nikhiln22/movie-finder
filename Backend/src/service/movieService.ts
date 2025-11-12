@@ -126,6 +126,11 @@ export class MovieService implements IMovieService {
 
       const favorites = this._movieRepository.getFavorites(sessionId);
 
+      console.log(
+        "favourites in getFavourites function in movieService:",
+        favorites
+      );
+
       return {
         success: true,
         data: favorites,
