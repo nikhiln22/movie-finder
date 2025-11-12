@@ -10,9 +10,9 @@ export const getOrCreateSessionId = (): string => {
   if (!sessionId) {
     sessionId = generateSessionId();
     localStorage.setItem(SESSION_ID_KEY, sessionId);
-    console.log("✅ New session ID created:", sessionId);
+    console.log("New session ID created:", sessionId);
   } else {
-    console.log("♻️ Using existing session ID:", sessionId);
+    console.log(" Using existing session ID:", sessionId);
   }
 
   return sessionId;
