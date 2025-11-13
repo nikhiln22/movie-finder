@@ -1,13 +1,12 @@
-import axios from "axios";
 import { getOrCreateSessionId } from "../utils/session";
-
-const BASE_URL = import.meta.env.VITE_API_URL;
+import { axiosInstance } from "../config/axios.config";
+import { MOVIE_API } from "../constants/apiRoutes";
 
 export const fetchMovies = async (query: string) => {
   try {
     console.log("entering to the fetchmovies service call");
-    const response = await axios.get(
-      `${BASE_URL}/api/movies/search?search=${query}`
+    const response = await axiosInstance.get(
+      `${MOVIE_API}/search?search=${query}`
     );
     return response.data;
   } catch (error) {
@@ -19,7 +18,7 @@ export const fetchFavourites = async () => {
   try {
     const sessionId = getOrCreateSessionId();
 
-    const response = await axios.get(`${BASE_URL}/api/movies/favourites`, {
+    const response = await axiosInstance.get(`${MOVIE_API}/favourites`, {
       params: { sessionId },
     });
 
@@ -41,7 +40,7 @@ export const addToFavourites = async (movie: {
 
     const sessionId = getOrCreateSessionId();
 
-    const response = await axios.post(`${BASE_URL}/api/movies/favourites`, {
+    const response = await axiosInstance.post(`${MOVIE_API}/favourites`, {
       movie,
       sessionId,
     });
@@ -58,8 +57,8 @@ export const removeFromFavourites = async (imdbID: string) => {
       `entering to the removeFromFavourites service call with ${imdbID}`
     );
     const sessionId = getOrCreateSessionId();
-    const response = await axios.delete(
-      `${BASE_URL}/api/movies/favourites/${imdbID}`,
+    const response = await axiosInstance.delete(
+      `${MOVIE_API}/favourites/${imdbID}`,
       {
         params: { sessionId },
       }
