@@ -1,4 +1,7 @@
-import { IMovieServiceDto } from "../interfaces/Dto/movieServiceDto";
+import {
+  IMovieServiceDto,
+  IOmdbMovie,
+} from "../interfaces/Dto/movieServiceDto";
 import { IMovieService } from "../interfaces/ImovieService";
 import { injectable, inject } from "tsyringe";
 import axios from "axios";
@@ -13,22 +16,36 @@ export class MovieService implements IMovieService {
   ) {}
 
   async getMovie(
-    search: string
-  ): Promise<{ success: boolean; message: string; data?: IMovieServiceDto[] }> {
+    search: string,
+    page: number
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data?: IMovieServiceDto[];
+    totalResults?: number;
+  }> {
     try {
       console.log("entering to the getmovie function inside the movie service");
-      console.log("received data in the service:", search);
+      console.log("received data in the service:", search, "page:", page);
+
       const response = await axios.get(
-        `${config.OMDB_BASE_URL}?apikey=${config.OMDB_API_KEY}&s=${search}`
+        `${config.OMDB_BASE_URL}?apikey=${config.OMDB_API_KEY}&s=${search}&page=${page}`
       );
-      console.log("fetched movie details from the omdb api");
+
       if (response.data.Response === "False") {
+        let msg = response.data.Error || "No movies found";
+
+        if (msg === "Too many results.") {
+          msg = "Please enter a more specific movie name";
+        }
+
         return {
           success: false,
-          message: response.data.Error || "No movies found",
+          message: msg,
         };
       }
-      const movies = response.data.Search.map((movie: any) => ({
+
+      const movies = response.data.Search.map((movie: IOmdbMovie) => ({
         imdbID: movie.imdbID,
         title: movie.Title,
         yearOfRelease: movie.Year,
@@ -41,6 +58,7 @@ export class MovieService implements IMovieService {
         success: true,
         message: "Movies fetched successfully",
         data: movies,
+        totalResults: Number(response.data.totalResults),
       };
     } catch (error) {
       return {

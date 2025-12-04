@@ -2,7 +2,10 @@ import { IFavoriteMovieDto } from "./Dto/favouritesDto";
 import { IMovieServiceDto } from "./Dto/movieServiceDto";
 
 export interface IMovieService {
-  getMovie(search: string): Promise<{
+  getMovie(
+    search: string,
+    page: number
+  ): Promise<{
     success: boolean;
     message: string;
     data?: IMovieServiceDto[];

@@ -17,6 +17,7 @@ export class MovieController {
       console.log("entering to the getmovie function in the movie controller");
 
       const validationResult = movieSearchSchema.safeParse(req.query);
+      const page = req.query.page ? Number(req.query.page) : 1;
 
       if (!validationResult.success) {
         res.status(HttpStatusCodes.BAD_REQUEST).json({
@@ -27,7 +28,7 @@ export class MovieController {
 
       const { search } = validationResult.data;
 
-      const result = await this._movieService.getMovie(search);
+      const result = await this._movieService.getMovie(search, page);
 
       res.status(HttpStatusCodes.OK).json(result);
     } catch (error) {
