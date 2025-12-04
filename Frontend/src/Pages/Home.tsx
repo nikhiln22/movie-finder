@@ -11,6 +11,7 @@ import type { IMovie } from "../model/movie";
 import { useDebounce } from "../hooks/debounce";
 import { SkeletonList } from "../component/SkeletonList";
 import toast from "react-hot-toast";
+import { Pagination } from "../component/Pagination";
 
 export const Home: React.FC = () => {
   const [movies, setMovies] = useState<IMovie[]>([]);
@@ -18,10 +19,14 @@ export const Home: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
   const debouncedQuery = useDebounce(searchQuery, 600);
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
+    setPage(1);
   };
 
   useEffect(() => {
@@ -36,7 +41,6 @@ export const Home: React.FC = () => {
 
   const handleToggleFavorite = async (movie: IMovie) => {
     const isAlreadyFav = favorites.some((f) => f.imdbID === movie.imdbID);
-    console.log("isAlreadyFav in the home page:", isAlreadyFav);
 
     if (isAlreadyFav) {
       const result = await removeFromFavourites(movie.imdbID);
@@ -63,19 +67,26 @@ export const Home: React.FC = () => {
     const fetchData = async () => {
       if (!debouncedQuery.trim()) {
         setMovies([]);
+        setPage(1);
+        setTotalPages(1);
         return;
       }
 
       setLoading(true);
 
       try {
-        const response = await fetchMovies(debouncedQuery);
+        const response = await fetchMovies(debouncedQuery, page);
 
         if (response.success) {
           setMovies(response.data || []);
+
+          if (response.totalResults) {
+            const pages = Math.ceil(Number(response.totalResults) / 10);
+            setTotalPages(pages);
+          }
         } else {
           setMovies([]);
-          toast.error(response.message || "Movie not found!");
+          toast.error(response.message);
         }
       } catch {
         toast.error("Failed to fetch movies!");
@@ -86,7 +97,7 @@ export const Home: React.FC = () => {
     };
 
     fetchData();
-  }, [debouncedQuery]);
+  }, [debouncedQuery, page]);
 
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
@@ -97,11 +108,19 @@ export const Home: React.FC = () => {
       {loading && <SkeletonList count={6} />}
 
       {!loading && movies.length > 0 && (
-        <MovieList
-          movies={movies}
-          favorites={favorites}
-          onToggleFavorite={handleToggleFavorite}
-        />
+        <>
+          <MovieList
+            movies={movies}
+            favorites={favorites}
+            onToggleFavorite={handleToggleFavorite}
+          />
+
+          <Pagination
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={(newPage) => setPage(newPage)}
+          />
+        </>
       )}
 
       {!loading && movies.length === 0 && (

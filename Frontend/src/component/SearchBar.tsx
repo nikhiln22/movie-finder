@@ -6,8 +6,8 @@ export const SearchBar: React.FC<ISearchBarProps> = ({ onSearch }) => {
   const [error, setError] = useState("");
 
   const validateQuery = (value: string) => {
-    if (value.length > 0 && value.length < 2) {
-      return "Search query must be at least 2 characters";
+    if (value.length > 0 && value.length < 3) {
+      return "Search query must be at least 3 characters";
     }
     if (value.length > 100) {
       return "Search query must not exceed 100 characters";
@@ -31,7 +31,7 @@ export const SearchBar: React.FC<ISearchBarProps> = ({ onSearch }) => {
     <div className="flex flex-col items-center gap-3 mb-8">
       <div className="flex flex-col">
         <input
-          type="text"
+          type="search"
           placeholder="Search the movie..."
           value={query}
           onChange={handleChange}

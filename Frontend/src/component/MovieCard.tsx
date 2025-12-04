@@ -34,7 +34,7 @@ export const MovieCard: React.FC<IMovieCardProps> = ({
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-700">
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gray-700">
             <Film className="w-16 h-16 text-gray-500 mx-auto mb-2" />
             <p className="text-gray-400 text-xs">No Poster</p>
           </div>

@@ -21,3 +21,9 @@ export interface IMovieCardProps {
 export interface SkeletonListProps {
   count: number;
 }
+
+export interface IPaginationProps {
+  currentPage: number;
+  totalPages: number;
+  onPageChange: (page: number) => void;
+}

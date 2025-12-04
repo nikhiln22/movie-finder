@@ -2,11 +2,11 @@ import { getOrCreateSessionId } from "../utils/session";
 import { axiosInstance } from "../config/axios.config";
 import { MOVIE_API } from "../constants/apiRoutes";
 
-export const fetchMovies = async (query: string) => {
+export const fetchMovies = async (query: string, page: number) => {
   try {
     console.log("entering to the fetchmovies service call");
     const response = await axiosInstance.get(
-      `${MOVIE_API}/search?search=${query}`
+      `${MOVIE_API}/search?search=${query}&page=${page}`
     );
     return response.data;
   } catch (error) {
